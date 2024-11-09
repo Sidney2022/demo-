@@ -136,7 +136,7 @@
         }
         if (!localStorage.getItem("logged_in")) {
             document.querySelector("body").style.visibility='hiddev'
-            window.location.replace("pin.html")
+            window.location.replace("pin.html?redirect_to=home")
         } else {
             document.querySelector("body").style.visibility='visible'
         }
