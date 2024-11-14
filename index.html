@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="main.css">
-  <title>Document</title>
+  <title>Weather App</title>
 </head>
 <body>
 
@@ -20,7 +20,7 @@
 		  <button type="submit"><i class="fa fa-search"></i></button>
         </form>
       </div>
-      <div class="current-loc-btn"><button> <i class="fa fa-location"></i>  Current Location </button></div>
+      <div onclick="getLocalWeatherInfo()" class="current-loc-btn"><button> <i class="fa fa-location"></i>  Current Location </button></div>
     </div>
 	<div class="weather-data">
 		<div class="time-card card">
@@ -39,7 +39,7 @@
 								<p><i class="fa fa-sun"></i></p>
 								<div><p>Sunrise</p> <span id="sunrise-time"></span> </div>
 							</div>
-							<div class="sun-time mt-2">
+							<div class="sun-time ">
 								<p><i class="fa fa-cloud-sun"></i></p>
 								<div><p>Sunset</p> <span id="sunset-time"></span> </div>
 							</div>
@@ -65,66 +65,12 @@
 		<div class="daily-forecast card">
 			<h3>3 Days Forecast: </h3>
 			<div class="forcast-items">
-				<div class="forecast-item">
-					<p class="forecast-weather-icon"> <i class="fa fa-cloud"></i> </p>
-					<p class="forecast-temp">30&deg;C</p>
-					<p class="forecast-day">Friday, 2 Sep</p>
-				</div>
-				<div class="forecast-item">
-					<p class="forecast-weather-icon"> <i class="fa fa-cloud"></i> </p>
-					<p class="forecast-temp">30&deg;C</p>
-					<p class="forecast-day">Friday, 2 Sep</p>
-				</div>
-				<div class="forecast-item">
-					<p class="forecast-weather-icon"> <i class="fa fa-cloud"></i> </p>
-					<p class="forecast-temp">30&deg;C</p>
-					<p class="forecast-day">Friday, 2 Sep</p>
-				</div>
 			</div>
 		</div>
 		<div class="hourly-forecast card">
-			<h3>Hourly Forecast</h3>
+			<h3>Today's Forecast</h3>
 			<div class="hourly-forecast-items">
-				<div class="hourly-forecast-item">
-					<p class="hf-time">12:00</p>
-					<p class="hf-icon"><i class="fa fa-sun"></i></p>
-					<p class="hf-temp">26&deg;C</p>
-					<p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
-					<p class="hf-wind-speed">3km/h</p>
-
-				</div>
-				<div class="hourly-forecast-item">
-					<p class="hf-time">12:00</p>
-					<p class="hf-icon"><i class="fa fa-sun"></i></p>
-					<p class="hf-temp">26&deg;C</p>
-					<p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
-					<p class="hf-wind-speed">3km/h</p>
-
-				</div>
-				<div class="hourly-forecast-item">
-					<p class="hf-time">12:00</p>
-					<p class="hf-icon"><i class="fa fa-sun"></i></p>
-					<p class="hf-temp">26&deg;C</p>
-					<p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
-					<p class="hf-wind-speed">3km/h</p>
-
-				</div>
-				<div class="hourly-forecast-item">
-					<p class="hf-time">12:00</p>
-					<p class="hf-icon"><i class="fa fa-sun"></i></p>
-					<p class="hf-temp">26&deg;C</p>
-					<p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
-					<p class="hf-wind-speed">3km/h</p>
-
-				</div>
-				<div class="hourly-forecast-item">
-					<p class="hf-time">12:00</p>
-					<p class="hf-icon"><i class="fa fa-sun"></i></p>
-					<p class="hf-temp">26&deg;C</p>
-					<p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
-					<p class="hf-wind-speed">3km/h</p>
-
-				</div>
+				
 			</div>
 		</div>
 	</div>

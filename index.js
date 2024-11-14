@@ -13,6 +13,8 @@ const currVis = document.getElementById("currVis")
 const currTime = document.getElementById("currTime")
 const currDate = document.getElementById("currDate")
 const CurrWeatherIcon = document.getElementById("curr-weather-icon")
+const forcastItems = document.querySelector(".forcast-items")
+const hourlyForcastItems = document.querySelector(".hourly-forecast-items")
 
 function humanReadableTime(seconds) {
     const date = new Date(seconds * 1000);
@@ -35,6 +37,7 @@ form.addEventListener('submit', (e) => {
     e.preventDefault()
     // alert('submited')
     getCurrentWeather(`https://api.openweathermap.org/data/2.5/weather?q=${input.value}&appid=${apiKey}&units=metric`);
+    getThreeDayForecast(`https://api.openweathermap.org/data/2.5/forecast?q=${input.value}&appid=${apiKey}&units=metric`);
     // getThreeDayForecast(input.value);
 })
 
@@ -70,32 +73,92 @@ const getCurrentWeather = async (dataUrl) => {
 };
 
 // Fetch 3-day forecast data (from 5-day, 3-hour interval forecast)
-const getThreeDayForecast = async (queryLocation) => {
-  const url = `https://api.openweathermap.org/data/2.5/forecast?q=${queryLocation}&appid=${apiKey}&units=metric`;
+const getThreeDayForecast = async (forecastUrl) => {
+  const url = forecastUrl
   try {
     const response = await axios.get(url);
     const data = response.data;
 
-    // Filter for the next 3 days
     const currentDate = new Date();
-    const threeDayForecast = data.list.filter(entry => {
+
+    // Set the end of today
+    const endOfToday = new Date(currentDate);
+    endOfToday.setHours(23, 59, 59, 999);
+
+    // Filter for today's forecast (hourly data)
+    const todaysForecast = data.list.filter(entry => {
       const entryDate = new Date(entry.dt * 1000);
-      return entryDate > currentDate && entryDate <= addDays(currentDate, 3);
+      return entryDate <= endOfToday;
     });
 
-    console.log("3-Day Forecast:");
-    threeDayForecast.forEach(entry => {
-      const date = new Date(entry.dt * 1000);
-      // console.log(`Date: ${date.toLocaleDateString()} Time: ${date.toLocaleTimeString()}`);
-      // console.log(`Temperature: ${entry.main.temp} °C`);
-      // console.log(`Weather: ${entry.weather[0].description}`);
-      // console.log("----------");
-      
+    // Filter for future forecasts (one per day)
+    const futureForecast = data.list.filter(entry => {
+      const entryDate = new Date(entry.dt * 1000);
+      return entryDate > endOfToday;
     });
+
+    // Format the date (e.g., "Thu, Nov 14")
+    const formatDate = (entryDate) => {
+      const options = { weekday: 'short', month: 'short', day: '2-digit' };
+      return entryDate.toLocaleDateString('en-US', options);
+    };
+
+    // Format the temperature (e.g., "11 / 7°C")
+    const formatTemp = (tempMax, tempMin) => {
+      return `${tempMax} / ${tempMin}°C`;
+    };
+
+    // Display Today's Forecast (every 3 hours)
+	hourlyForcastItems.innerHTML=''
+    todaysForecast.forEach(entry => {
+      const date = new Date(entry.dt * 1000);
+      const newDiv = document.createElement("div");
+      newDiv.classList.add('hourly-forecast-item');
+      newDiv.innerHTML = `
+        <p class="hf-time">${date.toLocaleTimeString()}</p>
+        <p class="hf-temp">${entry.main.temp}&deg;C</p>
+        <p class="hf-icon"><img src='https://openweathermap.org/img/w/${entry.weather[0].icon}.png'></p>
+        <p class="hf-temp caps">${entry.weather[0].description}</p>
+        <p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
+        <p class="hf-wind-speed">${entry.wind.speed} m/s</p>
+      `;
+      hourlyForcastItems.appendChild(newDiv);
+    });
+
+   
+    let lastDate = null;
+	let counter=0
+		forcastItems.innerHTML=''
+    futureForecast.forEach(entry => {
+      if (counter < 3) {
+        const entryDate = new Date(entry.dt * 1000);
+        const dateStr = formatDate(entryDate);
+
+        // Only create a new forecast div for new days (group by day)
+        if (dateStr !== lastDate) {
+			const tempMax = Math.round(entry.main.temp_max);
+			const tempMin = Math.round(entry.main.temp_min);
+			const newDiv = document.createElement("div");
+			newDiv.classList.add('forecast-item');
+			newDiv.innerHTML = `
+				<p class="forecast-day">${dateStr}</p>
+				<div class="fut-forecast-detail">
+					<p class=""><img src='https://openweathermap.org/img/w/${entry.weather[0].icon}.png'></p>
+					<p class="forecast-temp">${formatTemp(tempMax, tempMin)}</p>
+					<p class="forecast-weather caps">${entry.weather[0].description}</p>
+				</div> `;
+			forcastItems.appendChild(newDiv);
+			lastDate = dateStr; // Update the last date
+			counter++
+			}
+		}
+    });
+
   } catch (error) {
     console.error("Error fetching forecast:", error);
   }
 };
+
 
 // Helper function to add days to the current date
 function addDays(date, days) {
@@ -104,17 +167,12 @@ function addDays(date, days) {
   return result;
 }
 
-// Call functions to get data
-// let intervalId=setInterval(() => 
-  // 1000 )
-// getCurrentWeather("agbor"),
-// getThreeDayForecast("agbor"), 
 
 
 
 
 
-console.log(`time is ${humanReadableTime(1731469637).time}`)
+
 
 // theme switcher
 document.addEventListener("DOMContentLoaded", () => {
@@ -142,19 +200,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-//   alert(localStorage.getItem("weather-app-theme"))
 
-
-
-// m
-
-
-window.onload = function() {
+ function getLocalWeatherInfo() {
   if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
            getCurrentWeather(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric` )
+           getThreeDayForecast(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric` )
       }, function(error) {
           document.getElementById("location").innerHTML = "Error getting location: " + error.message;
       });
@@ -162,3 +215,7 @@ window.onload = function() {
       document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
   }
 };
+
+window.onload =getLocalWeatherInfo()
+
+
