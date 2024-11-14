@@ -50,7 +50,7 @@ body {
 
 .switcher {
   height: 20px;
-  width: 40px;
+  width: 50px;
   background-color: #fff;
   border-radius: 30px;
   position: relative;
@@ -70,8 +70,7 @@ body {
 
 .form-elem {
   flex-grow: 1;
-  min-width: 0;
-  max-width: 700px;
+  max-width: 50%;
   position: relative;
 }
 
@@ -91,11 +90,7 @@ body {
   color: var(--secondary-color);
   
 }
-.form-elem:active {
-  background:var(--tetiary-color);
-  color: var(--secondary-color);
-  
-}
+
 
 .form-elem button {
  background: transparent;
@@ -259,7 +254,7 @@ body {
   align-items: center;
   margin-top: 10px;
   background: var(--tetiary-color);
-  padding: 2px 30px;
+  padding: 10px 30px 0 30px;
   border-radius: 12px;
 }
 
@@ -299,7 +294,7 @@ body {
   }
 
   .temp-card .item1 .sun-times {
-    display: flex;
+    /* display: flex; */
     align-items: center;
     gap: 10px;
   }
@@ -308,6 +303,23 @@ body {
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
+
+ }
+ .daily-forecast {
+	order: 4;
+ }
+ .hourly-forecast {
+	order: 3;
+
+ }
+ .hourly-forecast-items {
+	flex-direction: column;
+	gap: 10px;
+ }
+ .hr-forecast-detail {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
  }
 
 }

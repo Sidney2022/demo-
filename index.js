@@ -16,35 +16,29 @@ const CurrWeatherIcon = document.getElementById("curr-weather-icon")
 const forcastItems = document.querySelector(".forcast-items")
 const hourlyForcastItems = document.querySelector(".hourly-forecast-items")
 
+
 function humanReadableTime(seconds) {
     const date = new Date(seconds * 1000);
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const hourFormatted = (hours % 12 || 12).toString().padStart(2, '0');
-    
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed
-    const year = date.getFullYear();
+    const formattedDate = (entryDate) => {
+		const options = { weekday: 'short', month: 'short', day: '2-digit' };
+		return entryDate.toLocaleDateString('en-US', options);
+	  };
+
     const formatted_datetime ={
-        time:`${hourFormatted}:${minutes} ${ampm}`,
-        date:`${month}/${day}/${year}` }
+        time:`${date.toLocaleTimeString()}`,
+        date:`${formattedDate(date)}` }
         console.log(formatted_datetime)
       return formatted_datetime
   }
 
 form.addEventListener('submit', (e) => {
     e.preventDefault()
-    // alert('submited')
     getCurrentWeather(`https://api.openweathermap.org/data/2.5/weather?q=${input.value}&appid=${apiKey}&units=metric`);
     getThreeDayForecast(`https://api.openweathermap.org/data/2.5/forecast?q=${input.value}&appid=${apiKey}&units=metric`);
-    // getThreeDayForecast(input.value);
 })
 
-// const axios = require('axios');  // For Node.js environments; omit this in a browser
 const apiKey = '8d1fe1b282c9be0f6b981381af8ce9c1';
-// const apiKey = 'df1e464b3e2c2392a4098159016e3c23'; //main key
-// var queryLocation = 'Agbor';
+
 
 // Fetch current weather data
 const getCurrentWeather = async (dataUrl) => {
@@ -52,8 +46,6 @@ const getCurrentWeather = async (dataUrl) => {
   try {
     const response = await axios.get(url);
     const data = response.data;
-    // console.log("Current Temperature:", data.main.temp, "°C");
-    // console.log("Weather Conditions:", data.weather[0].description);
     actualTemp.innerHTML = `${data.main.temp}&deg;C`
     feelsLikeTemp.innerHTML = `Feels Like : ${data.main.feels_like}&deg;C`
     cityName.textContent = `${data.name}`
@@ -67,10 +59,12 @@ const getCurrentWeather = async (dataUrl) => {
     currWindSp.textContent=`${data.wind.speed}m/s`
     currTime.textContent = `${humanReadableTime(data.dt).time}`
     currDate.textContent = `${humanReadableTime(data.dt).date}`
+	
   } catch (error) {
     console.error("Error fetching current weather:", error);
   }
 };
+
 
 // Fetch 3-day forecast data (from 5-day, 3-hour interval forecast)
 const getThreeDayForecast = async (forecastUrl) => {
@@ -78,14 +72,13 @@ const getThreeDayForecast = async (forecastUrl) => {
   try {
     const response = await axios.get(url);
     const data = response.data;
-
     const currentDate = new Date();
 
     // Set the end of today
     const endOfToday = new Date(currentDate);
     endOfToday.setHours(23, 59, 59, 999);
 
-    // Filter for today's forecast (hourly data)
+    // Filter for today's forecast (every 3 hours )
     const todaysForecast = data.list.filter(entry => {
       const entryDate = new Date(entry.dt * 1000);
       return entryDate <= endOfToday;
@@ -97,11 +90,7 @@ const getThreeDayForecast = async (forecastUrl) => {
       return entryDate > endOfToday;
     });
 
-    // Format the date (e.g., "Thu, Nov 14")
-    const formatDate = (entryDate) => {
-      const options = { weekday: 'short', month: 'short', day: '2-digit' };
-      return entryDate.toLocaleDateString('en-US', options);
-    };
+   
 
     // Format the temperature (e.g., "11 / 7°C")
     const formatTemp = (tempMax, tempMin) => {
@@ -115,24 +104,22 @@ const getThreeDayForecast = async (forecastUrl) => {
       const newDiv = document.createElement("div");
       newDiv.classList.add('hourly-forecast-item');
       newDiv.innerHTML = `
-        <p class="hf-time">${date.toLocaleTimeString()}</p>
-        <p class="hf-temp">${entry.main.temp}&deg;C</p>
-        <p class="hf-icon"><img src='https://openweathermap.org/img/w/${entry.weather[0].icon}.png'></p>
-        <p class="hf-temp caps">${entry.weather[0].description}</p>
-        <p class="ht-wind-dir"><i class="fa fa-compass"></i></p>
-        <p class="hf-wind-speed">${entry.wind.speed} m/s</p>
-      `;
+	  <p class="hf-time">${date.toLocaleTimeString()}</p>
+	  <div class="hr-forecast-detail">
+			<p class="hf-temp">${entry.main.temp}&deg;C</p>
+			<p class="hf-icon"><img src='https://openweathermap.org/img/w/${entry.weather[0].icon}.png'></p>
+			<p class="hf-temp caps">${entry.weather[0].description}</p>
+			<p class="hf-wind-speed">Wind - ${entry.wind.speed} m/s </p>
+		</div> `;
       hourlyForcastItems.appendChild(newDiv);
     });
 
-   
     let lastDate = null;
 	let counter=0
 		forcastItems.innerHTML=''
     futureForecast.forEach(entry => {
       if (counter < 3) {
-        const entryDate = new Date(entry.dt * 1000);
-        const dateStr = formatDate(entryDate);
+        const dateStr = humanReadableTime(entry.dt).date;
 
         // Only create a new forecast div for new days (group by day)
         if (dateStr !== lastDate) {
